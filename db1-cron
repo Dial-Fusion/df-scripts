@@ -1,0 +1,77 @@
+### keepalive script for astguiclient processes
+* * * * * /usr/share/astguiclient/ADMIN_keepalive_ALL.pl
+
+### Compress astguiclient log files and remove old ones
+25 2 * * * /usr/bin/find /var/log/astguiclient -maxdepth 1 -type f -mtime +1 -print | grep -v \.xz | xargs xz -9 >/dev/null 2>&1
+28 0 * * * /usr/bin/find /var/log/astguiclient -maxdepth 1 -type f -mtime +30 -print | xargs rm -f
+
+### fix the vicidial_agent_log once every hour and the full day run at night
+33 * * * * /usr/share/astguiclient/AST_cleanup_agent_log.pl
+50 0 * * * /usr/share/astguiclient/AST_cleanup_agent_log.pl --last-24hours
+## uncomment below if using QueueMetrics
+#*/5 * * * * /usr/share/astguiclient/AST_cleanup_agent_log.pl --only-qm-live-call-check
+
+### updater for VICIDIAL hopper
+* * * * * /usr/share/astguiclient/AST_VDhopper.pl -q
+
+### adjust the GMT offset for the leads in the vicidial_list table
+1 1,7 * * * /usr/share/astguiclient/ADMIN_adjust_GMTnow_on_leads.pl --list-settings
+
+### optimize the database tables within the asterisk database
+5 1 * * 0 /usr/share/astguiclient/AST_DB_optimize.pl
+
+### VICIDIAL agent time log weekly and daily summary report generation
+2 0 * * 0 /usr/share/astguiclient/AST_agent_week.pl
+22 0 * * * /usr/share/astguiclient/AST_agent_day.pl
+
+### VICIDIAL campaign export scripts (OPTIONAL)
+#32 0 * * * /usr/share/astguiclient/AST_VDsales_export.pl
+#42 0 * * * /usr/share/astguiclient/AST_sourceID_summary_export.pl
+
+### inventory report optional
+#1 7 * * * /usr/share/astguiclient/AST_dialer_inventory_snapshot.pl -q --override-24hours
+
+### roll logs monthly on high-volume dialing systems
+#30 1 1 * * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --months=6
+
+### roll call_log and vicidial_log_extended daily on very high-volume dialing systems
+#20 1 * * * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --daily
+
+## uncomment below if using Vtiger
+#1 1 * * * /usr/share/astguiclient/Vtiger_optimize_all_tables.pl --quiet
+
+# cleanup of the scheduled callback records
+25 0 * * * /usr/share/astguiclient/AST_DB_dead_cb_purge.pl --purge-non-cb --quiet
+# removal of duplicate scheduled callback records
+#35 0 * * * /usr/share/astguiclient/AST_DB_dead_cb_purge.pl --purge-non-cb --remove-dup-cb --quiet
+
+### inbound email parser should only be active on a single server
+* * * * * /usr/share/astguiclient/AST_inbound_email_parser.pl
+
+### flush queue DB table every hour for entries older than 1 hour
+11 * * * * /usr/share/astguiclient/AST_flush_DBqueue.pl -q
+
+#run daily backups
+0 2 * * * /mnt/backups/galera_backup.sh
+
+#run daily large table archiving
+45 0 * * * /root/df-scripts/ADMIN_archive_log_tables.pl --daily --carrier-daily --vlog-daily --skip-count-archive --skip-optimize-archive
+
+#run weekly 90 day archiving
+0 20 * * 0 /root/df-scripts/ADMIN_archive_log_tables.pl --days=90 --skip-count-archive --skip-optimize-source --skip-optimize-archive --did-log-days=90 --park-log-days=90 --recording-log-days=90
+
+#run monthly archiving
+#30 2 1 * * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --days=90 --did-log-days=90 --recording-log-days=90
+#15 18 02 10 * /usr/share/astguiclient/ADMIN_archive_log_tables.pl --days=90 --did-log-days=90 --recording-log-days=90
+
+#run daily lead moves
+#0 5 * * * /root/df-scripts/move_aged_leads.sh
+
+#run nightly maintenance
+5 0 * * * /root/df-scripts/nightly_maintenance.sh
+
+#run weekly archive table optimizing
+#30 18 * * 0 /root/df-scripts/optimize_archive.pl
+
+#assign shaken/stir to numbers and switch groups
+#0 22 * * 1 /root/df-scripts/trusthub/number-swap.sh
