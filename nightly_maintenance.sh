@@ -18,7 +18,7 @@ echo "ACTION: Ensuring all DIDs are set to ADMIN"
 echo
 
 echo "ACTION: Ensuring all DIDs have system-wide blocklist applied"
-/usr/bin/mysql -vv asterisk -e "UPDATE vicidial_inbound_dids SET filter_inbound_number = 'GROUP', filter_phone_group_id = 'NUISANCE' WHERE filter_inbound_number = 'DISABLED'"
+/usr/bin/mysql -vv asterisk -e "UPDATE vicidial_inbound_dids SET filter_inbound_number = 'GROUP', filter_phone_group_id = 'AANUISANCE' WHERE filter_inbound_number = 'DISABLED'"
 echo
 
 echo "ACTION: Ensuring all voicemail boxes are set to ADMIN"
