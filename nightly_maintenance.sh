@@ -66,12 +66,8 @@ echo
 #   /usr/bin/mysql -vv asterisk -e "DELETE from vicidial_hopper where campaign_id='136' and status IN('READY' ,'QUEUE' ,'DONE')"
 #fi
 
-echo "ACTION: Performing recurring nightly lead move #44"
-/usr/bin/mysql -vv asterisk -e "CALL sp_LeadMove44()"
-echo
-
-echo "ACTION: Performing recurring nightly lead move #49"
-/usr/bin/mysql -vv asterisk -e "CALL sp_LeadMove49()"
+echo "ACTION: Performing recurring nightly lead move #50"
+/usr/bin/mysql -vv asterisk -e "CALL sp_LeadMove50()"
 echo
 
 echo "ACTION: Clearing hopper for lead moves"
@@ -89,12 +85,12 @@ echo "ACTION: Deactivating users who have not logged in in 60 days"
 echo
 
 echo "INFO: Users who will be deleted within 5 days"
-/usr/bin/mysql asterisk -e "SELECT user,pass,full_name,user_level,user_group,last_login_date FROM vicidial_users WHERE last_login_date < DATE_SUB(NOW(), INTERVAL 85 DAY) AND active = 'N' AND user NOT IN('6666', 'VDAD', 'VDCL') AND user_group NOT LIKE 'DF%' AND user_group != 'ROBOTS' ORDER BY user"
+/usr/bin/mysql asterisk -e "SELECT user,pass,full_name,user_level,user_group,last_login_date FROM vicidial_users WHERE last_login_date < DATE_SUB(NOW(), INTERVAL 70 DAY) AND active = 'N' AND user NOT IN('6666', 'VDAD', 'VDCL') AND user_group NOT LIKE 'DF%' AND user_group != 'ROBOTS' ORDER BY user"
 echo
 
-echo "ACTION: Deleting inactive users who have not logged in in 90 days"
-/usr/bin/mysql asterisk -e "SELECT user,pass,full_name,user_level,user_group,last_login_date FROM vicidial_users WHERE last_login_date < DATE_SUB(NOW(), INTERVAL 90 DAY) AND active = 'N' AND user NOT IN('6666', 'VDAD', 'VDCL') AND user_group NOT LIKE 'DF%' AND user_group != 'ROBOTS'"
-/usr/bin/mysql -vv asterisk -e "DELETE FROM vicidial_users WHERE last_login_date < DATE_SUB(NOW(), INTERVAL 90 DAY) AND active = 'N' AND user NOT IN('6666', 'VDAD', 'VDCL') AND user_group NOT LIKE 'DF%' AND user_group != 'ROBOTS'"
+echo "ACTION: Deleting inactive users who have not logged in in 75 days"
+/usr/bin/mysql asterisk -e "SELECT user,pass,full_name,user_level,user_group,last_login_date FROM vicidial_users WHERE last_login_date < DATE_SUB(NOW(), INTERVAL 75 DAY) AND active = 'N' AND user NOT IN('6666', 'VDAD', 'VDCL') AND user_group NOT LIKE 'DF%' AND user_group != 'ROBOTS'"
+/usr/bin/mysql -vv asterisk -e "DELETE FROM vicidial_users WHERE last_login_date < DATE_SUB(NOW(), INTERVAL 75 DAY) AND active = 'N' AND user NOT IN('6666', 'VDAD', 'VDCL') AND user_group NOT LIKE 'DF%' AND user_group != 'ROBOTS'"
 echo
 
 echo "ACTION: Forcing password change for all active users with default passwords"
@@ -111,3 +107,4 @@ echo "ACTION: Running fstrim to reclaim free space"
 echo
 
 echo "Script complete, exiting!"
+/usr/bin/date
